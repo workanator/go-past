@@ -12,45 +12,32 @@ import (
 	"strings"
 )
 
-// ParseFileOptions options for file parsing.
-type ParseFileOptions struct {
-	FileSet  *token.FileSet
-	Filename string
-}
-
-func (o *ParseFileOptions) normalize() *ParseFileOptions {
-	if o == nil {
-		return &ParseFileOptions{
-			FileSet: token.NewFileSet(),
-		}
-	}
-
-	if o.FileSet == nil {
-		o.FileSet = token.NewFileSet()
-	}
-
-	return o
-}
-
 // ParseFile reads top-level declarations from the Go file.
-func ParseFile(r io.Reader, opts *ParseFileOptions) (*File, error) {
-	opts = opts.normalize()
+func ParseFile(r io.Reader, path string, oo ...ParsingOption) (*File, error) {
+	opts := defaultParsingOptions()
+	for _, o := range oo {
+		o(&opts)
+	}
 
-	f, err := parser.ParseFile(opts.FileSet, opts.Filename, r, parser.ParseComments)
+	if opts.fileSet == nil {
+		opts.fileSet = token.NewFileSet()
+	}
+
+	f, err := parser.ParseFile(opts.fileSet, path, r, parser.ParseComments)
 	if err != nil {
 		return nil, fmt.Errorf("parse: %w", err)
 	}
 
 	file := &File{
-		Filename:    opts.Filename,
+		Path:        path,
 		PackageName: f.Name.Name,
 		Doc:         strings.Trim(f.Doc.Text(), "\n"),
 		Imports:     make([]*Import, 0, len(f.Imports)),
-		Function:    make(map[string]*Function, len(f.Decls)),
-		Struct:      make(map[string]*Struct, len(f.Decls)),
-		Interface:   make(map[string]*Interface, len(f.Decls)),
-		Variable:    make(map[string]*Variable, len(f.Decls)),
-		Constant:    make(map[string]*Constant, len(f.Decls)),
+		Functions:   make(map[string]*Function, len(f.Decls)),
+		Structs:     make(map[string]*Struct, len(f.Decls)),
+		Interfaces:  make(map[string]*Interface, len(f.Decls)),
+		Variables:   make(map[string]*Variable, len(f.Decls)),
+		Constants:   make(map[string]*Constant, len(f.Decls)),
 	}
 
 	for _, imp := range f.Imports {

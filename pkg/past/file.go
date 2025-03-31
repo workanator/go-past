@@ -6,15 +6,15 @@ import (
 
 // File is the Go source file with declarations in it.
 type File struct {
-	Filename    string
+	Path        string
 	PackageName string
 	Doc         string
 	Imports     []*Import
-	Function    map[string]*Function
-	Struct      map[string]*Struct
-	Interface   map[string]*Interface
-	Variable    map[string]*Variable
-	Constant    map[string]*Constant
+	Functions   map[string]*Function
+	Structs     map[string]*Struct
+	Interfaces  map[string]*Interface
+	Variables   map[string]*Variable
+	Constants   map[string]*Constant
 
 	owningPackage *Package
 }
@@ -31,6 +31,10 @@ func (f *File) Package() *Package {
 
 // AddImports create [Import]s from the declarations and adds to the list of file imports.
 func (f *File) AddImports(decls ...decls.Import) {
+	if len(f.Imports) == 0 {
+		f.Imports = make([]*Import, 0, len(decls))
+	}
+
 	for _, d := range decls {
 		item := &Import{
 			Decl: d,
@@ -43,60 +47,80 @@ func (f *File) AddImports(decls ...decls.Import) {
 
 // AddFunctions create [Function]s from the declarations and adds to the list of file functions.
 func (f *File) AddFunctions(decls ...decls.Func) {
+	if len(f.Functions) == 0 {
+		f.Functions = make(map[string]*Function)
+	}
+
 	for _, d := range decls {
 		item := &Function{
 			Decl: d,
 		}
 		item.bind(f)
 
-		f.Function[item.Decl.Name] = item
+		f.Functions[item.Decl.Name] = item
 	}
 }
 
 // AddStructs create [Struct]s from the declarations and adds to the list of file structs.
 func (f *File) AddStructs(decls ...decls.Struct) {
+	if len(f.Structs) == 0 {
+		f.Structs = make(map[string]*Struct)
+	}
+
 	for _, d := range decls {
 		item := &Struct{
 			Decl: d,
 		}
 		item.bind(f)
 
-		f.Struct[item.Decl.Name] = item
+		f.Structs[item.Decl.Name] = item
 	}
 }
 
 // AddInterfaces create [Interface]s from the declarations and adds to the list of file interfaces.
 func (f *File) AddInterfaces(decls ...decls.Interface) {
+	if len(f.Interfaces) == 0 {
+		f.Interfaces = make(map[string]*Interface)
+	}
+
 	for _, d := range decls {
 		item := &Interface{
 			Decl: d,
 		}
 		item.bind(f)
 
-		f.Interface[item.Decl.Name] = item
+		f.Interfaces[item.Decl.Name] = item
 	}
 }
 
 // AddVariables create [Variable]s from the declarations and adds to the list of file variables.
 func (f *File) AddVariables(decls ...decls.Value) {
+	if len(f.Variables) == 0 {
+		f.Variables = make(map[string]*Variable)
+	}
+
 	for _, d := range decls {
 		item := &Variable{
 			Decl: d,
 		}
 		item.bind(f)
 
-		f.Variable[item.Decl.Name] = item
+		f.Variables[item.Decl.Name] = item
 	}
 }
 
 // AddConstants create [Constant]s from the declarations and adds to the list of file constants.
 func (f *File) AddConstants(decls ...decls.Value) {
+	if len(f.Constants) == 0 {
+		f.Constants = make(map[string]*Constant)
+	}
+
 	for _, d := range decls {
 		item := &Constant{
 			Decl: d,
 		}
 		item.bind(f)
 
-		f.Constant[item.Decl.Name] = item
+		f.Constants[item.Decl.Name] = item
 	}
 }
