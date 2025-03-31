@@ -10,6 +10,19 @@ type Package struct {
 	owningModule *Module
 }
 
+func NewPackage(path, name string, oo ...ParsingOption) *Package {
+	opts := defaultParsingOptions()
+	for _, o := range oo {
+		o(&opts)
+	}
+
+	return &Package{
+		Path:        path,
+		Name:        name,
+		parsingOpts: opts,
+	}
+}
+
 // bind attaches the package to the owning [Module].
 func (p *Package) bind(owningModule *Module) {
 	p.owningModule = owningModule

@@ -34,9 +34,11 @@ func ParseModule(fsys fs.FS, path string, oo ...ParsingOption) (*Module, error) 
 	}
 
 	return &Module{
+		ModuleData: ModuleData{
+			Name:     moduleName,
+			Packages: make(map[string]*Package),
+		},
 		Path:        path,
-		Name:        moduleName,
-		Packages:    make(map[string]*Package),
 		parsingOpts: opts,
 		fs:          fsys,
 	}, nil

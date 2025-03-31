@@ -29,7 +29,7 @@ func (f *File) Package() *Package {
 	return f.owningPackage
 }
 
-// AddImports create [Import]s from the declarations and adds to the list of file imports.
+// AddImports create the set of [Import] from the declarations and adds to the list of file imports.
 func (f *File) AddImports(decls ...decls.Import) {
 	if len(f.Imports) == 0 {
 		f.Imports = make([]*Import, 0, len(decls))
@@ -45,7 +45,7 @@ func (f *File) AddImports(decls ...decls.Import) {
 	}
 }
 
-// AddFunctions create [Function]s from the declarations and adds to the list of file functions.
+// AddFunctions create the set of [Function] from the declarations and adds to the list of file functions.
 func (f *File) AddFunctions(decls ...decls.Func) {
 	if len(f.Functions) == 0 {
 		f.Functions = make(map[string]*Function)
@@ -61,7 +61,7 @@ func (f *File) AddFunctions(decls ...decls.Func) {
 	}
 }
 
-// AddStructs create [Struct]s from the declarations and adds to the list of file structs.
+// AddStructs create the set of [Struct] from the declarations and adds to the list of file structs.
 func (f *File) AddStructs(decls ...decls.Struct) {
 	if len(f.Structs) == 0 {
 		f.Structs = make(map[string]*Struct)
@@ -77,7 +77,7 @@ func (f *File) AddStructs(decls ...decls.Struct) {
 	}
 }
 
-// AddInterfaces create [Interface]s from the declarations and adds to the list of file interfaces.
+// AddInterfaces create the set of [Interface] from the declarations and adds to the list of file interfaces.
 func (f *File) AddInterfaces(decls ...decls.Interface) {
 	if len(f.Interfaces) == 0 {
 		f.Interfaces = make(map[string]*Interface)
@@ -93,7 +93,7 @@ func (f *File) AddInterfaces(decls ...decls.Interface) {
 	}
 }
 
-// AddVariables create [Variable]s from the declarations and adds to the list of file variables.
+// AddVariables create the set of [Variable] from the declarations and adds to the list of file variables.
 func (f *File) AddVariables(decls ...decls.Value) {
 	if len(f.Variables) == 0 {
 		f.Variables = make(map[string]*Variable)
@@ -109,7 +109,7 @@ func (f *File) AddVariables(decls ...decls.Value) {
 	}
 }
 
-// AddConstants create [Constant]s from the declarations and adds to the list of file constants.
+// AddConstants create the set of [Constant] from the declarations and adds to the list of file constants.
 func (f *File) AddConstants(decls ...decls.Value) {
 	if len(f.Constants) == 0 {
 		f.Constants = make(map[string]*Constant)
