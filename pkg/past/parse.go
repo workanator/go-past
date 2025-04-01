@@ -1,6 +1,7 @@
 package past
 
 import (
+	"github.com/denormal/go-gitignore"
 	"go/token"
 	"regexp"
 )
@@ -9,9 +10,11 @@ import (
 type ParsingOption func(*parsingOptions)
 
 type parsingOptions struct {
-	fileSet         *token.FileSet
-	includeFileMask *regexp.Regexp
-	excludeFileMask *regexp.Regexp
+	fileSet              *token.FileSet
+	includeFileMask      *regexp.Regexp
+	excludeFileMask      *regexp.Regexp
+	followGitIgnoreRules bool
+	gitIgnore            gitignore.GitIgnore
 }
 
 func defaultParsingOptions() parsingOptions {
@@ -45,5 +48,19 @@ func WithIncludeFileMask(includeFileMask *regexp.Regexp) ParsingOption {
 func WithExcludeFileMask(excludeFileMask *regexp.Regexp) ParsingOption {
 	return func(o *parsingOptions) {
 		o.excludeFileMask = excludeFileMask
+	}
+}
+
+// WithFollowGitIgnoreRules instructs the parser to skip parsing files and directories ignored in .gitignore.
+func WithFollowGitIgnoreRules(follow bool) ParsingOption {
+	return func(o *parsingOptions) {
+		o.followGitIgnoreRules = follow
+	}
+}
+
+// WithGitIgnore sets the gitignore set of rules.
+func WithGitIgnore(gitIgnore gitignore.GitIgnore) ParsingOption {
+	return func(o *parsingOptions) {
+		o.gitIgnore = gitIgnore
 	}
 }

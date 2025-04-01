@@ -3,6 +3,8 @@ package past
 import (
 	"cmp"
 	"fmt"
+	"github.com/denormal/go-gitignore"
+	"golang.org/x/mod/modfile"
 	"io/fs"
 	"path/filepath"
 	"strings"
@@ -22,6 +24,8 @@ type Module struct {
 	parsingOpts   parsingOptions
 	owningProject *Project
 	fs            fs.FS
+	goMod         *modfile.File
+	gitIgnore     gitignore.GitIgnore
 }
 
 // bind attaches the module to the owning [Project].
@@ -51,8 +55,14 @@ func (m *Module) FindPackage(relativePath string) (*Package, error) {
 		return pkg, nil
 	}
 
+	parsingOpts := make([]ParsingOption, 0, 2)
+	parsingOpts = append(parsingOpts, withParsingOptions(m.parsingOpts))
+	if m.gitIgnore != nil {
+		parsingOpts = append(parsingOpts, WithGitIgnore(m.gitIgnore))
+	}
+
 	if relativePath == "" {
-		pkgs, parseErr := ParsePackages(m.fs, ".", withParsingOptions(m.parsingOpts))
+		pkgs, parseErr := ParsePackages(m.fs, ".", parsingOpts...)
 		if parseErr != nil {
 			return nil, fmt.Errorf("parse packages: %w", parseErr)
 		}
@@ -60,7 +70,7 @@ func (m *Module) FindPackage(relativePath string) (*Package, error) {
 		if len(pkgs) == 0 {
 			words := strings.Split(m.Name, "/")
 			pkgs = []*Package{
-				NewPackage("", words[len(words)-1], withParsingOptions(m.parsingOpts)),
+				NewPackage("", words[len(words)-1], parsingOpts...),
 			}
 		}
 

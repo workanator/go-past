@@ -36,17 +36,22 @@ func ParsePackages(fsys fs.FS, path string, oo ...ParsingOption) ([]*Package, er
 
 	pm := make(map[string]*Package)
 	for i, entry := range entries {
+		filename := entry.Name()
+		filePath := filepath.Join(path, filename)
+
 		if !opts.nameMatches(entry.Name()) {
 			continue
 		}
+		if opts.gitIgnore != nil && opts.gitIgnore.Ignore(filePath) {
+			continue
+		}
 
-		filename := entry.Name()
 		fsysFile, openErr := fsys.Open(filename)
 		if openErr != nil {
 			return nil, fmt.Errorf("open file %s: %w", filename, openErr)
 		}
 
-		file, parseErr := ParseFile(fsysFile, filepath.Join(path, filename), withParsingOptions(opts))
+		file, parseErr := ParseFile(fsysFile, filePath, withParsingOptions(opts))
 		if parseErr != nil {
 			_ = fsysFile.Close()
 			return nil, fmt.Errorf("parse file %s: %w", filename, parseErr)
